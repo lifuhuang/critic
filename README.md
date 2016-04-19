@@ -1,0 +1,2 @@
+# critic
+Automated review analyzer.
