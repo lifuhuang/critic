@@ -109,5 +109,5 @@ def make_data_frame(source, dest):
     
     
 if __name__ == '__main__':
-    dictionary = Dictionary(glove200d_path)
-    #make_data_frame(data_path, dest_path)
+    dictionary = Dictionary(glove100d_path)
+    make_data_frame(data_path, dest_path)
