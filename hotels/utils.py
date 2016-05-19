@@ -71,9 +71,9 @@ def make_data_frame(source, dest):
             return None
         return np.array(valid_indices)
     
-    ratings = [str(c).startswith('ratings') for c in df.columns]
+    ratings = filter(lambda x: x.startswith('ratings'), df.columns)
     result = df[ratings]
-    result['vector'] = df['text'].apply(vectorizer)
+    result.loc[:, 'vector'] = df['text'].apply(vectorizer)
     pd.to_pickle(result, dest)
     
     
