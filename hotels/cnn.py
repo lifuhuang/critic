@@ -21,7 +21,7 @@ sys.path.append('/home/lifu/PySpace/legonet')
 import numpy as np
 import pandas as pd
 from legonet import optimizers
-from legonet.layers import FullyConnected, Embedding, Convolution2D, Pooling2D
+from legonet.layers import FullyConnected, Embedding, Convolution, Pooling
 from legonet.topology import Sequential, Parallel
 from legonet.models import NeuralNetwork
 
@@ -69,16 +69,16 @@ if __name__ == '__main__':
     model.add(Embedding([sentence_len], word_table))
 
     seq1 = Sequential('3gram')
-    seq1.add(Convolution2D([3, 100], 64))
-    seq1.add(Pooling2D([sentence_len, 100], strides=[1, 1]))
+    seq1.add(Convolution([3, 100], 64))
+    seq1.add(Pooling([sentence_len, 100], strides=[1, 1]))
     
     seq2 = Sequential('4gram')
-    seq2.add(Convolution2D([5, 100], 64))
-    seq2.add(Pooling2D([sentence_len, 100], strides=[1, 1]))
+    seq2.add(Convolution([5, 100], 64))
+    seq2.add(Pooling([sentence_len, 100], strides=[1, 1]))
         
     seq3 = Sequential('5gram')
-    seq3.add(Convolution2D([5, 100], 64))
-    seq3.add(Pooling2D([sentence_len, 100], strides=[1, 1]))
+    seq3.add(Convolution([5, 100], 64))
+    seq3.add(Pooling([sentence_len, 100], strides=[1, 1]))
     
     para = Parallel(along_dim=3)
     para.add(seq1)
