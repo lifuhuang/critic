@@ -96,15 +96,15 @@ if __name__ == '__main__':
 
     seq1 = Sequential('3gram')
     seq1.add(Convolution([3, wv_len], 64, padding='VALID'))
-    seq1.add(Pooling([sentence_len, wv_len], strides=[1, 1]))
+    seq1.add(Pooling([sentence_len - 2, 1], strides=[1, 1]))
     
     seq2 = Sequential('4gram')
     seq2.add(Convolution([4, wv_len], 64, padding='VALID'))
-    seq2.add(Pooling([sentence_len, wv_len], strides=[1, 1]))
+    seq2.add(Pooling([sentence_len - 3, 1], strides=[1, 1]))
         
     seq3 = Sequential('5gram')
     seq3.add(Convolution([5, wv_len], 64, padding='VALID'))
-    seq3.add(Pooling([sentence_len, wv_len], strides=[1, 1]))
+    seq3.add(Pooling([sentence_len - 4, 1], strides=[1, 1]))
     
     para = Parallel(along_dim=3)
     para.add(seq1)
