@@ -27,29 +27,23 @@ from legonet.models import NeuralNetwork
 
 from utils import Dictionary
 
-data_path = '/home/lifu/hotels/df1'
+data_path = '/home/lifu/hotels/regression_dataset'
 glove_path = {200: '/home/lifu/glove/glove.6B.200d.txt', 
               100: '/home/lifu/glove/glove.6B.100d.txt'}
 sentence_len = 256
 wv_len = 200
 
 
-def prepare_data_deprecated():
+def prepare_data():
     word_table = Dictionary(glove_path[wv_len]).to_array()[..., None]
     
     df = pd.read_pickle(data_path)  
-    df = df[df['vector'].notnull() & df['ratings.overall'].notnull()]
-    df = df[df['vector'].apply(len) <= sentence_len]
     df['vector'] = df['vector'].apply(
         lambda x: np.append(x, np.zeros(sentence_len-x.size)))
     split = df.shape[0] // 10 * 9
-        
-    df['target'] = 1
-    df.loc[df['ratings.overall'] <= 3, 'target'] = 0
-    df.loc[df['ratings.overall'] == 5, 'target'] = 2
     
     X = np.array(list(df['vector']))
-    Y = df['target'].values
+    Y = df.iloc[:, :-1].values
     
     X_train = X[:split]
     Y_train = Y[:split]
@@ -59,7 +53,7 @@ def prepare_data_deprecated():
     
     return word_table, X_train, Y_train, X_dev, Y_dev
     
-def prepare_data():
+def prepare_data_deprecated():
     word_table = Dictionary(glove_path[wv_len]).to_array()[..., None]
     
     df = pd.read_pickle(data_path)  
@@ -91,28 +85,35 @@ if __name__ == '__main__':
     
     word_table, X_train, Y_train, X_dev, Y_dev = prepare_data()
 
-    model = NeuralNetwork(optimizer=optimizers.Adam(), log_dir='logs')
+    model = NeuralNetwork(
+        optimizer=optimizers.Adam(), 
+        log_dir='logs', 
+        loss_fn='mean_square', 
+        output_fn='identity',
+        target_dtype='float32')
+        
     model.add(Embedding([sentence_len], word_table))
 
     seq1 = Sequential('3gram')
-    seq1.add(Convolution([3, wv_len], 64))
+    seq1.add(Convolution([3, wv_len], 64, padding='VALID'))
     seq1.add(Pooling([sentence_len, wv_len], strides=[1, 1]))
     
     seq2 = Sequential('4gram')
-    seq2.add(Convolution([5, wv_len], 64))
+    seq2.add(Convolution([4, wv_len], 64, padding='VALID'))
     seq2.add(Pooling([sentence_len, wv_len], strides=[1, 1]))
         
     seq3 = Sequential('5gram')
-    seq3.add(Convolution([5, wv_len], 64))
+    seq3.add(Convolution([5, wv_len], 64, padding='VALID'))
     seq3.add(Pooling([sentence_len, wv_len], strides=[1, 1]))
     
     para = Parallel(along_dim=3)
     para.add(seq1)
     para.add(seq2)
+    para.add(seq3)
     
     model.add(para)
-    model.add(FullyConnected(64, 'relu'))
-    model.add(FullyConnected(3, name='output'))
+    model.add(FullyConnected(128, 'relu'))
+    model.add(FullyConnected(5, name='output'))
     model.build()
     print 'Model constructed!'
 
@@ -123,8 +124,8 @@ if __name__ == '__main__':
         print 'File not found!'
     
     if args.mode == 'train':
-        model.fit(X_train, Y_train, n_epochs=2, batch_size=32, 
-                  freq_log=10, freq_checkpoint=100, loss_decay=0.9, 
+        model.fit(X_train, Y_train, n_epochs=5, batch_size=32, 
+                  freq_log=1, freq_checkpoint=200, loss_decay=0.9, 
                   checkpoint_dir='./checkpoints')
     elif args.mode == 'test':
         n_test = 30
