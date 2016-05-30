@@ -42,20 +42,20 @@ def prepare_data():
         lambda x: np.append(x, np.zeros(sentence_len-x.size)))
     split = df.shape[0] // 10 * 9
 
-    df['overall'] = -1.
-    df.loc[df['ratings.overall'] <= 3, 'overall'] = 0.
-    df.loc[df['ratings.overall'] == 5, 'overall'] = 1.
+    df['c_overall'] = -1.
+    df.loc[df['overall'] <= 3, 'c_overall'] = 0.
+    df.loc[df['overall'] == 5, 'c_overall'] = 1.
 
-    df['cleanliness'] = -1.
-    df.loc[df['ratings.cleanliness'] <= 3, 'cleanliness'] = 0.
-    df.loc[df['ratings.cleanliness'] == 5, 'cleanliness'] = 1.
+    df['c_cleanliness'] = -1.
+    df.loc[df['cleanliness'] <= 3, 'c_cleanliness'] = 0.
+    df.loc[df['cleanliness'] == 5, 'c_cleanliness'] = 1.
 
-    df['location'] = -1.
-    df.loc[df['ratings.location'] <= 3, 'location'] = 0.
-    df.loc[df['ratings.location'] == 5, 'location'] = 1.
+    df['c__location'] = -1.
+    df.loc[df['location'] <= 3, 'c_location'] = 0.
+    df.loc[df['location'] == 5, 'c_location'] = 1.
 
     X = np.array(list(df['vector']))
-    Y = df[['overall', 'cleanliness', 'location']].values
+    Y = df[['c_overall', 'c_cleanliness', 'c_location']].values
     
     X_train = X[:split]
     Y_train = Y[:split]
