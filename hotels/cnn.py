@@ -85,6 +85,7 @@ def prepare_data_deprecated():
 
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser()
     parser.add_argument('mode')
     args = parser.parse_args()
