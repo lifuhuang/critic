@@ -50,7 +50,7 @@ def prepare_data():
     df.loc[df['cleanliness'] <= 3, 'c_cleanliness'] = 0.
     df.loc[df['cleanliness'] == 5, 'c_cleanliness'] = 1.
 
-    df['c__location'] = -1.
+    df['c_location'] = -1.
     df.loc[df['location'] <= 3, 'c_location'] = 0.
     df.loc[df['location'] == 5, 'c_location'] = 1.
 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     parser.add_argument('mode')
     args = parser.parse_args()
     
-    word_table, X_train, Y_train, X_dev, Y_dev = prepare_data()
+    word_table, X_train, Y_train, X_dev, Y_dev = prepare_data_deprecated()
 
     model = NeuralNetwork(
         optimizer=optimizers.Adam(), 
