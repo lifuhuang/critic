@@ -41,27 +41,6 @@ def prepare_data():
     df['vector'] = df['vector'].apply(
         lambda x: np.append(x, np.zeros(sentence_len-x.size)))
     split = df.shape[0] // 10 * 9
-    
-    X = np.array(list(df['vector']))
-    Y = df.iloc[:, :-1].values
-    
-    X_train = X[:split]
-    Y_train = Y[:split]
-    X_dev = X[split:]
-    Y_dev = Y[split:]
-    print 'Completed data preparation!'
-    
-    return word_table, X_train, Y_train, X_dev, Y_dev
-    
-def prepare_data_deprecated():
-    word_table = Dictionary(glove_path[wv_len]).to_array()[..., None]
-    
-    df = pd.read_pickle(data_path)  
-    df = df[df['vector'].notnull() & df['ratings.overall'].notnull()]
-    df = df[df['vector'].apply(len) <= sentence_len]
-    df['vector'] = df['vector'].apply(
-        lambda x: np.append(x, np.zeros(sentence_len-x.size)))
-    split = df.shape[0] // 10 * 9
 
     df['overall'] = -1.
     df.loc[df['ratings.overall'] <= 3, 'overall'] = 0.
@@ -74,7 +53,7 @@ def prepare_data_deprecated():
     df['location'] = -1.
     df.loc[df['ratings.location'] <= 3, 'location'] = 0.
     df.loc[df['ratings.location'] == 5, 'location'] = 1.
-    
+
     X = np.array(list(df['vector']))
     Y = df['overall', 'cleanliness', 'location'].values
     
@@ -85,6 +64,24 @@ def prepare_data_deprecated():
     print 'Completed data preparation!'
     
     return word_table, X_train, Y_train, X_dev, Y_dev
+
+
+def prepare_data_deprecated():
+    dict_size = 10000
+    word_table = np.random.randn(dict_size, 200, 1)
+    split = 900
+
+    X = np.random.randint(0, dict_size, (1000, sentence_len))
+    Y = np.random.randint(0, 1, (1000, 3))
+    
+    X_train = X[:split]
+    Y_train = Y[:split]
+    X_dev = X[split:]
+    Y_dev = Y[split:]
+    print 'Completed data preparation!'
+    
+    return word_table, X_train, Y_train, X_dev, Y_dev
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
