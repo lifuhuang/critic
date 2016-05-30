@@ -90,7 +90,7 @@ if __name__ == '__main__':
     parser.add_argument('mode')
     args = parser.parse_args()
     
-    word_table, X_train, Y_train, X_dev, Y_dev = prepare_data()
+    word_table, X_train, Y_train, X_dev, Y_dev = prepare_data_deprecated()
 
     model = NeuralNetwork(
         optimizer=optimizers.Adam(), 
@@ -135,7 +135,7 @@ if __name__ == '__main__':
                   freq_log=1, freq_checkpoint=200, loss_decay=0.9, 
                   checkpoint_dir='./checkpoints')
     elif args.mode == 'test':
-        n_test = 30
+        n_test = 50
         yh = model.predict(X_dev[:n_test])
         for i in xrange(n_test):
             print '%d:' % i
