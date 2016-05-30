@@ -63,17 +63,17 @@ def prepare_data_deprecated():
         lambda x: np.append(x, np.zeros(sentence_len-x.size)))
     split = df.shape[0] // 10 * 9
 
-    df['overall'] = -1
-    df.loc[df['ratings.overall'] <= 3, 'overall'] = 0
-    df.loc[df['ratings.overall'] == 5, 'overall'] = 1
+    df['overall'] = -1.
+    df.loc[df['ratings.overall'] <= 3, 'overall'] = 0.
+    df.loc[df['ratings.overall'] == 5, 'overall'] = 1.
 
-    df['cleanliness'] = -1
-    df.loc[df['ratings.cleanliness'] <= 3, 'cleanliness'] = 0
-    df.loc[df['ratings.cleanliness'] == 5, 'cleanliness'] = 1
+    df['cleanliness'] = -1.
+    df.loc[df['ratings.cleanliness'] <= 3, 'cleanliness'] = 0.
+    df.loc[df['ratings.cleanliness'] == 5, 'cleanliness'] = 1.
 
-    df['location'] = -1
-    df.loc[df['ratings.location'] <= 3, 'location'] = 0
-    df.loc[df['ratings.location'] == 5, 'location'] = 1
+    df['location'] = -1.
+    df.loc[df['ratings.location'] <= 3, 'location'] = 0.
+    df.loc[df['ratings.location'] == 5, 'location'] = 1.
     
     X = np.array(list(df['vector']))
     Y = df['overall', 'cleanliness', 'location'].values
@@ -121,7 +121,7 @@ if __name__ == '__main__':
     
     model.add(para)
     model.add(FullyConnected(128, 'relu'))
-    model.add(FullyConnected(5, name='output'))
+    model.add(FullyConnected(3, name='output'))
     model.build()
     print 'Model constructed!'
 
