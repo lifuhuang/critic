@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 from legonet import optimizers
 from legonet.layers import FullyConnected, Embedding, Convolution, Pooling
-from legonet.topology import Sequential, Parallel
+from legonet.pieces import Sequential, Parallel
 from legonet.models import NeuralNetwork
 
 from utils import Dictionary
@@ -62,13 +62,21 @@ def prepare_data_deprecated():
     df['vector'] = df['vector'].apply(
         lambda x: np.append(x, np.zeros(sentence_len-x.size)))
     split = df.shape[0] // 10 * 9
-        
-    df['target'] = 1
-    df.loc[df['ratings.overall'] <= 3, 'target'] = 0
-    df.loc[df['ratings.overall'] == 5, 'target'] = 2
+
+    df['overall'] = -1
+    df.loc[df['ratings.overall'] <= 3, 'overall'] = 0
+    df.loc[df['ratings.overall'] == 5, 'overall'] = 1
+
+    df['cleanliness'] = -1
+    df.loc[df['ratings.cleanliness'] <= 3, 'cleanliness'] = 0
+    df.loc[df['ratings.cleanliness'] == 5, 'cleanliness'] = 1
+
+    df['location'] = -1
+    df.loc[df['ratings.location'] <= 3, 'location'] = 0
+    df.loc[df['ratings.location'] == 5, 'location'] = 1
     
     X = np.array(list(df['vector']))
-    Y = df['target'].values
+    Y = df['overall', 'cleanliness', 'location'].values
     
     X_train = X[:split]
     Y_train = Y[:split]
@@ -88,8 +96,8 @@ if __name__ == '__main__':
     model = NeuralNetwork(
         optimizer=optimizers.Adam(), 
         log_dir='logs', 
-        loss_fn='mean_square', 
-        output_fn='identity',
+        loss_fn='sigmoid_cross_entropy',
+        output_fn='sigmoid',
         target_dtype='float32')
         
     model.add(Embedding([sentence_len], word_table))

@@ -39,7 +39,7 @@ def prepare_fake_data():
     word_table = np.random.randn(dict_size, wordvec_len, 1)
     X = np.random.randint(0, dict_size, (dataset_size, sentence_len))
     Y = np.random.randint(0, 3, dataset_size)
-    split = dataset_size * (1 - dev_ratio)
+    split = int(dataset_size * (1 - dev_ratio))
     X_train = X[:split]
     X_dev = X[split:]
     Y_train = Y[:split]
