@@ -55,7 +55,7 @@ def prepare_data():
     df.loc[df['ratings.location'] == 5, 'location'] = 1.
 
     X = np.array(list(df['vector']))
-    Y = df['overall', 'cleanliness', 'location'].values
+    Y = df[['overall', 'cleanliness', 'location']].values
     
     X_train = X[:split]
     Y_train = Y[:split]
