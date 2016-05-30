@@ -61,6 +61,7 @@ def prepare_data():
     Y_train = Y[:split]
     X_dev = X[split:]
     Y_dev = Y[split:]
+
     print 'Completed data preparation!'
     
     return word_table, X_train, Y_train, X_dev, Y_dev
