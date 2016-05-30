@@ -85,7 +85,8 @@ def prepare_data_deprecated():
     print 'Completed data preparation!'
     
     return word_table, X_train, Y_train, X_dev, Y_dev
-    
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('mode')
