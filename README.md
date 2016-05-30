@@ -1,2 +1,2 @@
-# critic
-Automated review analyzer.
+# Critic
+A text review analyzer based on LegoNet.
