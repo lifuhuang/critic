@@ -90,7 +90,7 @@ if __name__ == '__main__':
     parser.add_argument('mode')
     args = parser.parse_args()
     
-    word_table, X_train, Y_train, X_dev, Y_dev = prepare_data_deprecated()
+    word_table, X_train, Y_train, X_dev, Y_dev = prepare_data()
 
     model = NeuralNetwork(
         optimizer=optimizers.Adam(), 
