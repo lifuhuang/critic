@@ -33,7 +33,7 @@ glove_path = {200: '/home/lifu/glove/glove.6B.200d.txt',
               100: '/home/lifu/glove/glove.6B.100d.txt'}
 sentence_len = 256
 wv_len = 200
-batch_size = 64
+batch_size = 128
 
 
 def prepare_data():
@@ -141,7 +141,7 @@ if __name__ == '__main__':
         print 'File not found!'
     
     if args.mode == 'train' or args.mode == 'debug':
-        model.fit(X_train, Y_train, n_epochs=5, batch_size=batch_size, freq_log=1, freq_checkpoint=200, loss_decay=0.9,
+        model.fit(X_train, Y_train, n_epochs=5, batch_size=batch_size, freq_log=1, freq_checkpoint=500, loss_decay=0.95,
                   checkpoint_dir='./checkpoints')
 
     if args.mode == 'test' or args.mode == 'debug':
