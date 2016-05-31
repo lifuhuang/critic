@@ -14,6 +14,7 @@ Created on Thu May  5 14:49:42 2016
 
 import sys
 import argparse
+
 ######
 sys.path.append('/home/lifu/PySpace/legonet')
 ######
@@ -32,6 +33,7 @@ glove_path = {200: '/home/lifu/glove/glove.6B.200d.txt',
               100: '/home/lifu/glove/glove.6B.100d.txt'}
 sentence_len = 256
 wv_len = 200
+batch_size = 64
 
 
 def prepare_data():
@@ -65,7 +67,7 @@ def prepare_data_deprecated():
     split = 900
 
     X = np.random.randint(0, dict_size, (1000, sentence_len))
-    Y = np.random.randint(0, 1, (1000,))
+    Y = np.random.randint(0, 3, (1000,))
     
     X_train = X[:split]
     Y_train = Y[:split]
@@ -76,13 +78,29 @@ def prepare_data_deprecated():
     return word_table, X_train, Y_train, X_dev, Y_dev
 
 
+def print_test(X, Y):
+    n_correct = 0
+    n_total = len(X)
+    for i in xrange(len(X)):
+        yh = np.argmax(model.predict(X[None, i]))
+        if yh == Y[i]:
+            n_correct += 1
+
+    print 'Total samples: {n_samples}\n' \
+          'Correct predictions: {n_correct}\n' \
+          'Accuracy: {precesion}%'.format(n_samples=n_total, n_correct=n_correct,
+                                          precesion=(n_correct * 100.0 / n_total))
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('mode')
     args = parser.parse_args()
-    
-    word_table, X_train, Y_train, X_dev, Y_dev = prepare_data()
+
+    if args.mode == "debug":
+        word_table, X_train, Y_train, X_dev, Y_dev = prepare_data_deprecated()
+    else:
+        word_table, X_train, Y_train, X_dev, Y_dev = prepare_data()
 
     model = NeuralNetwork(
         optimizer=optimizers.Adam(), 
@@ -122,14 +140,10 @@ if __name__ == '__main__':
     except Exception as e:
         print 'File not found!'
     
-    if args.mode == 'train':
-        model.fit(X_train, Y_train, n_epochs=5, batch_size=32, 
-                  freq_log=1, freq_checkpoint=200, loss_decay=0.9, 
+    if args.mode == 'train' or args.mode == 'debug':
+        model.fit(X_train, Y_train, n_epochs=5, batch_size=batch_size, freq_log=1, freq_checkpoint=200, loss_decay=0.9,
                   checkpoint_dir='./checkpoints')
-    elif args.mode == 'test':
-        n_test = 50
-        yh = model.predict(X_dev[:n_test])
-        for i in xrange(n_test):
-            print '%d:' % i
-            print 'Y_true', Y_dev[i]
-            print 'Y_pred', yh[i]
+
+    if args.mode == 'test' or args.mode == 'debug':
+        #print_test(X_train, Y_train)
+        print_test(X_dev, Y_dev)
