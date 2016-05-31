@@ -65,7 +65,7 @@ def prepare_data_deprecated():
     split = 900
 
     X = np.random.randint(0, dict_size, (1000, sentence_len))
-    Y = np.random.randint(0, 1, (1000, ))
+    Y = np.random.randint(0, 1, (1000,))
     
     X_train = X[:split]
     Y_train = Y[:split]
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     parser.add_argument('mode')
     args = parser.parse_args()
     
-    word_table, X_train, Y_train, X_dev, Y_dev = prepare_data_deprecated()
+    word_table, X_train, Y_train, X_dev, Y_dev = prepare_data()
 
     model = NeuralNetwork(
         optimizer=optimizers.Adam(), 
