@@ -42,29 +42,12 @@ def prepare_data():
         lambda x: np.append(x, np.zeros(sentence_len-x.size)))
     split = df.shape[0] // 10 * 9
 
-    # df['c_overall'] = -1.
-    # df.loc[df['overall'] <= 3, 'c_overall'] = 0.
-    # df.loc[df['overall'] == 5, 'c_overall'] = 1.
-    #
-    # df['c_cleanliness'] = -1.
-    # df.loc[df['cleanliness'] <= 3, 'c_cleanliness'] = 0.
-    # df.loc[df['cleanliness'] == 5, 'c_cleanliness'] = 1.
-    #
-    # df['c_location'] = -1.
-    # df.loc[df['location'] <= 3, 'c_location'] = 0.
-    # df.loc[df['location'] == 5, 'c_location'] = 1.
-
-    df['overall_p'] = df['overall'] == 5
-    df['overall_n'] = df['overall'] <= 4
-
-    df['cleanliness_p'] = df['cleanliness'] == 5
-    df['cleanliness_n'] = df['cleanliness'] <= 4
-
-    df['location_p'] = df['location'] == 5
-    df['location_n'] = df['location'] <= 4
+    df['c_overall'] = 1
+    df.loc[df['overall'] <= 3, 'c_overall'] = 0.
+    df.loc[df['overall'] == 5, 'c_overall'] = 2.
 
     X = np.array(list(df['vector']))
-    Y = df[['overall_p', 'overall_n', 'cleanliness_p', 'cleanliness_n', 'location_p', 'location_n']].values / 3.0
+    Y = df['c_overall'].values
     
     X_train = X[:split]
     Y_train = Y[:split]
@@ -82,7 +65,7 @@ def prepare_data_deprecated():
     split = 900
 
     X = np.random.randint(0, dict_size, (1000, sentence_len))
-    Y = np.random.randint(0, 1, (1000, 3))
+    Y = np.random.randint(0, 1, (1000, ))
     
     X_train = X[:split]
     Y_train = Y[:split]
@@ -99,14 +82,14 @@ if __name__ == '__main__':
     parser.add_argument('mode')
     args = parser.parse_args()
     
-    word_table, X_train, Y_train, X_dev, Y_dev = prepare_data()
+    word_table, X_train, Y_train, X_dev, Y_dev = prepare_data_deprecated()
 
     model = NeuralNetwork(
         optimizer=optimizers.Adam(), 
         log_dir='logs', 
-        loss_fn='softmax_cross_entropy',
+        loss_fn='sparse_softmax_cross_entropy',
         output_fn='softmax',
-        target_dtype='float32')
+        target_dtype='int64')
         
     model.add(Embedding([sentence_len], word_table))
 
@@ -129,7 +112,7 @@ if __name__ == '__main__':
     
     model.add(para)
     model.add(FullyConnected(128, 'relu'))
-    model.add(FullyConnected(6, name='output'))
+    model.add(FullyConnected(3, name='output'))
     model.build()
     print 'Model constructed!'
 
