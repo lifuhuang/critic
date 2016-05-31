@@ -110,7 +110,8 @@ def show_confusion_matrix(Y_true, Y_pred):
     class_names = ['negative', 'neutral', 'positive']
     plt.xticks(range(3), class_names)
     plt.yticks(range(3), class_names)
-    plt.show()
+
+    plt.savefig('confusion_matrix.png', format='png')
 
 
 def test(X):
