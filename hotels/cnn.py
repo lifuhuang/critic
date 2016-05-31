@@ -20,6 +20,7 @@ sys.path.append('/home/lifu/PySpace/legonet')
 ######
 
 import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
 from legonet import optimizers
 from legonet.layers import FullyConnected, Embedding, Convolution, Pooling
@@ -73,18 +74,52 @@ def prepare_data_deprecated():
     Y_train = Y[:split]
     X_dev = X[split:]
     Y_dev = Y[split:]
+
     print 'Completed data preparation!'
     
     return word_table, X_train, Y_train, X_dev, Y_dev
 
 
-def print_test(X, Y):
-    n_correct = 0
-    n_total = len(X)
-    for i in xrange(len(X)):
-        yh = np.argmax(model.predict(X[None, i]))
-        if yh == Y[i]:
-            n_correct += 1
+def show_confusion_matrix(Y_true, Y_pred):
+    conf_matrix = np.zeros((3, 3))
+    for i in xrange(len(Y_pred)):
+        conf_matrix[Y_true[i], Y_pred[i]] += 1
+
+    norm_conf = []
+    for i in conf_matrix:
+        a = 0
+        tmp_arr = []
+        a = sum(i, 0)
+        for j in i:
+            tmp_arr.append(float(j) / float(a))
+        norm_conf.append(tmp_arr)
+
+    fig = plt.figure()
+    plt.clf()
+    ax = fig.add_subplot(111)
+    ax.set_aspect(1)
+    res = ax.imshow(np.array(norm_conf), cmap=plt.cm.jet, interpolation='nearest')
+
+    width, height = conf_matrix.shape
+
+    for x in xrange(width):
+        for y in xrange(height):
+            ax.annotate(str(conf_matrix[x][y]), xy=(y, x), horizontalalignment='center', verticalalignment='center')
+
+    cb = fig.colorbar(res)
+    class_names = ['negative', 'neutral', 'positive']
+    plt.xticks(range(3), class_names)
+    plt.yticks(range(3), class_names)
+    plt.show()
+
+
+def test(X):
+    return np.array([np.argmax(model.predict(X[None, i])) for i in xrange(len(X))])
+
+
+def print_test_msg(Y_true, Y_pred):
+    n_total = len(Y_true)
+    n_correct = np.sum(Y_pred == Y_true)
 
     print 'Total samples: {n_samples}\n' \
           'Correct predictions: {n_correct}\n' \
@@ -145,5 +180,7 @@ if __name__ == '__main__':
                   checkpoint_dir='./checkpoints')
 
     if args.mode == 'test' or args.mode == 'debug':
-        #print_test(X_train, Y_train)
-        print_test(X_dev, Y_dev)
+        Y_pred = test(X_dev)
+        print_test_msg(Y_dev, Y_pred)
+        show_confusion_matrix(Y_dev, Y_pred)
+
