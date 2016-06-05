@@ -106,7 +106,7 @@ def show_confusion_matrix(Y_true, Y_pred):
         for y in xrange(height):
             ax.annotate(str(conf_matrix[x][y]), xy=(y, x), horizontalalignment='center', verticalalignment='center')
 
-    cb = fig.colorbar(res)
+    fig.colorbar(res)
     class_names = ['negative', 'neutral', 'positive']
     plt.xticks(range(3), class_names)
     plt.yticks(range(3), class_names)
