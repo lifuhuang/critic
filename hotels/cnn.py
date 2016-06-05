@@ -29,8 +29,8 @@ from legonet.models import NeuralNetwork
 
 from utils import Dictionary
 
-data_path = '/home/lifu/hotels/regression_dataset'
-glove_path = {200: '/home/lifu/glove/glove.6B.200d.txt', 
+data_path = '/home/lifu/hotels/high_var'
+glove_path = {200: '/home/lifu/glove/glove.6B.200d.txt',
               100: '/home/lifu/glove/glove.6B.100d.txt'}
 sentence_len = 256
 wv_len = 200
@@ -45,12 +45,12 @@ def prepare_data():
         lambda x: np.append(x, np.zeros(sentence_len-x.size)))
     split = df.shape[0] // 10 * 9
 
-    df['c_overall'] = 1
-    df.loc[df['overall'] <= 3, 'c_overall'] = 0.
-    df.loc[df['overall'] == 5, 'c_overall'] = 2.
+    target_names = ['overall', 'cleanliness', 'location', 'service', 'value']
+    for name in target_names:
+        df['t_' + name] = (df[name] <= 3).astype('float32')
 
     X = np.array(list(df['vector']))
-    Y = df['c_overall'].values
+    Y = df.loc[map(lambda x: 't_' + x, target_names)].values
     
     X_train = X[:split]
     Y_train = Y[:split]
@@ -141,9 +141,9 @@ if __name__ == '__main__':
     model = NeuralNetwork(
         optimizer=optimizers.Adam(), 
         log_dir='logs', 
-        loss_fn='sparse_softmax_cross_entropy',
+        loss_fn='softmax_cross_entropy',
         output_fn='softmax',
-        target_dtype='int64')
+        target_dtype='float32')
         
     model.add(Embedding([sentence_len], word_table))
 
@@ -158,15 +158,20 @@ if __name__ == '__main__':
     seq3 = Sequential('5gram')
     seq3.add(Convolution([5, wv_len], 64, padding='VALID'))
     seq3.add(Pooling([sentence_len - 4, 1], strides=[1, 1]))
+
+    seq4 = Sequential('6gram')
+    seq4.add(Convolution([6, wv_len], 64, padding='VALID'))
+    seq4.add(Pooling([sentence_len - 5, 1], strides=[1, 1]))
     
     para = Parallel(along_dim=3)
     para.add(seq1)
     para.add(seq2)
     para.add(seq3)
+    para.add(seq4)
     
     model.add(para)
     model.add(FullyConnected(128, 'relu'))
-    model.add(FullyConnected(3, name='output'))
+    model.add(FullyConnected(5, name='output'))
     model.build()
     print 'Model constructed!'
 
